@@ -1,6 +1,9 @@
 extern crate rand;
 
 use rand::{Rng, SeedableRng, StdRng};
+use std::collections::HashMap;
+use std::io::Read;
+use std::fs::File;
 
 const BASE: u32 = 26-6+9;
 
@@ -54,12 +57,25 @@ fn int_to_string(seed: u32) -> String {
 
 fn main() {
     let no_words = ["P1SS", "SH1T", "FVCK", "SH17", "BVTT", "D1CK", "CVNT", "CL1T", "FVGG", "FVGS", "DVMN", "D1K3", "K1K3", "CVCK", "KVCK"];
+    let mut f = File::open("all.txt").unwrap();
+    let mut buffer = String::new();
+    f.read_to_string(&mut buffer).unwrap();
+
+    let mut no_words_map = HashMap::new();
+
+    for word in no_words.iter() {
+        no_words_map.insert(word.to_string(), word.to_string());
+    }
+    for word in buffer.split('\n') {
+        no_words_map.insert(word.to_string(), word.to_string());
+    }
+
     let seed: &[_] = &[1, 2, 3, 4];
     let mut rng: StdRng = SeedableRng::from_seed(seed);
     let mut population = Vec::new();
     for i in 0..BASE.pow(4) {
         //println!("{}", i);
-        if !no_words.contains( &int_to_string(i).as_str() ) {
+        if !no_words_map.contains_key::<str>( &int_to_string(i).as_str() ) {
             population.push(i);
         } else {
             //println!("Rejected: {}", int_to_string(i));
